@@ -70,8 +70,8 @@ Uses the models and the lambda tensor from ```rg.py``` to predict the 6-pt funct
 **Issues and questions:** @keeganstoner, stoner.ke@northeastern.edu <p>
 
 
-## Citation
-
+## BibTeX Citation
+``` 
 @misc{halverson2020neural,
     title={Neural Networks and Quantum Field Theory},
     author={James Halverson and Anindita Maiti and Keegan Stoner},
@@ -80,3 +80,4 @@ Uses the models and the lambda tensor from ```rg.py``` to predict the 6-pt funct
     archivePrefix={arXiv},
     primaryClass={cs.LG}
 }
+```
