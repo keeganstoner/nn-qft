@@ -66,10 +66,17 @@ Uses the models and the lambda tensor from ```rg.py``` to predict the 6-pt funct
 
 ## Contact
 
-**Code author:** Keegan Stoner <p> 
+**Code authors:** Keegan Stonerm Anindita Maiti<p> 
 **Issues and questions:** @keeganstoner, stoner.ke@northeastern.edu <p>
 
 
 ## Citation
 
-(BIBTEX CITATION)
+@misc{halverson2020neural,
+    title={Neural Networks and Quantum Field Theory},
+    author={James Halverson and Anindita Maiti and Keegan Stoner},
+    year={2020},
+    eprint={2008.08601},
+    archivePrefix={arXiv},
+    primaryClass={cs.LG}
+}
