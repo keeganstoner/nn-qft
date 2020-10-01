@@ -64,7 +64,7 @@ class GaussNet(nn.Module):
         ez = torch.exp(z)
         # norm = torch.exp((4*args.sb**2+4*args.sw**2*torch.norm(x,dim=1)**2)/2.0)
         # fix args issue above
-        norm = torch.exp((4+4*torch.norm(x,dim=1)**2)/(2.0*args.d_in))
+        norm = torch.exp((4+4*torch.norm(x,dim=1)**2)/(2.0*self.args.d_in))
         norm = norm.view(norm.shape[0],1)
         norm = torch.sqrt(norm)
         ezonorm = ez / norm

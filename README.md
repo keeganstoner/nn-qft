@@ -66,7 +66,7 @@ Uses the models and the lambda tensor from ```rg.py``` to predict the 6-pt funct
 
 ## Contact
 
-**Code authors:** Keegan Stonerm Anindita Maiti<p> 
+**Code authors:** Keegan Stoner, Anindita Maiti<p> 
 **Issues and questions:** @keeganstoner, stoner.ke@northeastern.edu <p>
 
 
