@@ -8,11 +8,11 @@ import statistics
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--activation", type=str, default = "Erf")
+    parser.add_argument("--activation", type=str, default = "ReLU")
     parser.add_argument('--exp', type=str, default = None)
     parser.add_argument("--width", type=int, default = 100)
     parser.add_argument("--n-inputs", type = int, default = 6)
-    parser.add_argument("--n-models", type = int, default = 10**4)
+    parser.add_argument("--n-models", type = int, default = 10**3)
     parser.add_argument("--d-in", type = int, default = 1)
     parser.add_argument("--d-out", type = int, default = 1)
     parser.add_argument("--sb", type = float, default = 1.0)
@@ -72,7 +72,7 @@ if __name__ == "__main__":
         GP_array = np.array(six_pt_tensor(xs, args))
 
     # experimental 6-pt function
-    n_exp = [0. for _ in range(k)]
+    n_exp, n_exp4 = [0. for _ in range(k)], [0. for _ in range(k)]
 
     # GP 6-pt function
     if path.exists("six_pt_exp_"+args.activation+"_width"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle"):
@@ -83,19 +83,25 @@ if __name__ == "__main__":
             fss_chunk[width] = fss[width].narrow_copy(0,chunk_num*chunk,chunk)
 
             n_tensor = torch.mean(n_point(fss_chunk[width], n), dim=0)
-
+            n_tensor4 = torch.mean(n_point(fss_chunk[width], 4), dim=0)
             # only true when d_out = 1:
             assert(args.d_out == 1)
             n_tensor = n_tensor.view(n_tensor.shape[0:n])
             n_exp[chunk_num] = n_tensor.tolist()
+            n_exp4[chunk_num] = n_tensor4.tolist()
 
             if run == 4:
                 print("done with run ", run+1)
 
         exp_array_full = np.nanmean(n_exp, axis = 0)
         exp_array = trim_sym_tensor(exp_array_full, args)
+        expt4 = trim_sym_tensor4(np.nanmean(n_exp4, axis = 0), args)
 
-    cutoffs = [7, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000, 2000, 5000, 7000, 10000, 20000, 40000, 60000, 80000, 100000]
+    if args.activation == "ReLU":
+        cutoffs = [7, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000, 2000, 5000, 7000, 10000, 20000, 40000, 60000, 80000, 100000] #21
+    
+    if args.activation == "GaussNet" or args.activation == "Erf":
+        cutoffs = [np.inf]
 
     logcut, GP_list, GP_lam_list = [], [], []
 
@@ -103,6 +109,21 @@ if __name__ == "__main__":
 
     fourptcontribution = [[[[[[0. for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))]
     xslist = xs.tolist()
+
+
+    def calc_lam(xs):  
+        denom = [[[[np.nan for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))]   
+        denom = np.array(denom)
+        numerator = np.array(four_pt_tensor(xs, args)) - expt4
+        for i in range(len(xs)):
+            for j in range(i, len(xs)):
+                for k in range(j, len(xs)):
+                    for l in range(k, len(xs)):
+                        denom[i][j][k][l] = four_pt_int(xs[i], xs[j], xs[k], xs[l], cutoff, args)
+        denom = np.array(denom)
+        lam = (numerator/denom)
+        print("cutoff: ", cutoff, "stdev in lam = ", np.nanstd(lam))
+        return lam
 
 
     # # parallelize the cutoff integrals
@@ -140,7 +161,12 @@ if __name__ == "__main__":
                                 num += intkappa(x4, x2, x1, x3, x5, x6, cutoff, args)
                                 # total lambda contribution to the 6pt function
                                 fourptcontribution[xslist.index([x1])][xslist.index([x2])][xslist.index([x3])][xslist.index([x4])][xslist.index([x5])][xslist.index([x6])] = num
-        lambda_tensor = pickle.load(open("lam_m_"+str(cutoff)+"_"+args.activation+"_width_"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle",'rb'))
+        if path.exists("lam_"+str(cutoff)+"_"+args.activation+"_width_"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle"):
+            lambda_tensor = pickle.load(open("lam_"+str(cutoff)+"_"+args.activation+"_width_"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle",'rb'))
+            print("Loaded lambda tensor from rg analysis")
+        else: 
+            lambda_tensor = calc_lam(xs)
+
         lambda_average = np.nanmean(lambda_tensor)
         # computation of lambda term
         lambda_term = 24.*lambda_average*np.array(fourptcontribution)
@@ -211,7 +237,7 @@ if __name__ == "__main__":
     plt.ylim(0, 1.2)
     plt.xlabel(lm("\\log_{10}\\Lambda"),fontsize=label_size)
     plt.tight_layout()
-    #plt.savefig("delta_add_"+args.activation+".pdf",bbox_inches='tight')
+    plt.savefig("six_pt_pred_"+args.activation+".pdf",bbox_inches='tight')
     plt.legend()
     plt.figure()
-    plt.show()
+    # plt.show()

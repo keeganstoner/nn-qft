@@ -16,7 +16,7 @@ if __name__ == "__main__":
     parser.add_argument('--exp', type=str, default = None)
     parser.add_argument("--width", type=int, default = 100)
     parser.add_argument("--n-inputs", type = int, default = 6)
-    parser.add_argument("--n-models", type = int, default = 10**4)
+    parser.add_argument("--n-models", type = int, default = 10**3)
     parser.add_argument("--d-in", type = int, default = 1)
     parser.add_argument("--d-out", type = int, default = 1)
     parser.add_argument("--sb", type = float, default = 1.0)
@@ -75,10 +75,7 @@ if __name__ == "__main__":
 
 
     for args.width in widths:
-        # ten runs of args.n_models models saved in different pickle files
         for run in range(runs):
-            # if args.activation == "ReLU":
-            #     args.sb = 10**-100
             print("Generating networks for "+args.activation+" at width "+str(args.width), " - run ", run+1, " of ", runs)
             fss = create_networks(xs, args)
             #print("Pickling: "+args.activation+" at width "+str(args.width))

@@ -6,11 +6,11 @@ from lib import *
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--activation", type=str, default = "Erf")
+    parser.add_argument("--activation", type=str, default = "ReLU")
     parser.add_argument('--exp', type=str, default = None)
     parser.add_argument("--width", type=int, default = 100)
     parser.add_argument("--n-inputs", type = int, default = 6)
-    parser.add_argument("--n-models", type = int, default = 10**4)
+    parser.add_argument("--n-models", type = int, default = 10**3)
     parser.add_argument("--d-in", type = int, default = 1)
     parser.add_argument("--d-out", type = int, default = 1)
     parser.add_argument("--sb", type = float, default = 1.0)
@@ -18,59 +18,30 @@ if __name__ == "__main__":
     parser.add_argument("--mb", type = float, default = 0.0)
     parser.add_argument("--mw", type = float, default = 0.0)
     parser.add_argument("--cuda", action = 'store_true', default = False)
-    parser.add_argument("--n-pt", type = int, default = 4)
 
     args = parser.parse_args()
-    n = args.n_pt
+    n = 4
 
     runs = 1
     if args.d_in == 1:
-        if args.activation == "Erf":
-            xs = torch.tensor([[-1],[-0.6],[-0.2],[0.2],[0.6], [1.0]])
-            xset = "xset1"
-        if args.activation == "GaussNet":
-            xs = 0.01*torch.tensor([[-1],[-0.6],[-0.2],[0.2],[0.6], [1.0]])
-            xset = "xset2"
         if args.activation == "ReLU":
             xs = torch.tensor([[0.2],[0.4],[0.6],[0.8],[1.0],[1.2]])
             xset = "xset1A"
 
     if args.d_in == 2:
-        xs = torch.tensor([-1.0, 1.0])
-        xs = torch.cartesian_prod(xs, xs)
-        xset = "xset3"
-        if args.activation == "GaussNet":
-                xs = 0.01*xs
-                xset = "xset4"
         if args.activation == "ReLU":
             xs = torch.tensor([0.5, 1.0])
             xs = torch.cartesian_prod(xs, xs)
             xset = "xset3A"
 
     if args.d_in == 3:
-        xs = torch.tensor([[-1., -1., -1.],[ 1.,  1., -1.],[-1.,  1.,  1.],[ 1., -1.,  1.]])
-        xset = "xset5"
-        if args.activation == "GaussNet":
-            xs = 0.01*xs
-            xset = "xset6"
         if args.activation == "ReLU":
             xs = torch.tensor([[0.2, 0.2, 0.2],[ 1.,  1., 0.2],[0.2,  1.,  1.],[ 1., 0.2,  1.]])
             xset = "xset5A"
 
-    if args.activation == "ReLU":
-        args.sb == 10**-100
-
+    args.sb == 10**-100
     args.n_inputs = len(xs)
-
-
-    # this is the width that defines the NGP
-    # the widths chosen here are in the perturbative regime
-    if args.activation == "ReLU":
-        width = 20
-    if args.activation == "GaussNet":
-        width = 100
-    if args.activation == "Erf":
-        width = 5
+    width = 20 # defines NGP 
     args.width = width
 
 
@@ -119,17 +90,17 @@ if __name__ == "__main__":
     denom = [[[[np.nan for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))] for i in range(len(xs))]
     lambda_averages = {}
 
-    cutoffs = [7, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000, 2000, 5000, 7000, 10000, 20000, 40000, 60000, 80000, 100000] #21
     
-    # # parallelize the cutoff integrals
-    # from mpi4py import MPI
-    # comm = MPI.COMM_WORLD
-    # size = comm.Get_size()
-    # rank = comm.Get_rank()
-    # cutoffs = [cutoffs[rank]]
+    if args.activation == "ReLU":
+        cutoffs = [7, 10, 15, 20, 30, 40, 50, 70, 100, 200, 500, 1000, 2000, 5000, 7000, 10000, 20000, 40000, 60000, 80000, 100000] #21
+    
+    if args.activation == "GaussNet" or args.activation == "Erf":
+        cutoffs = [np.inf]
 
     for cutoff in cutoffs:
-        log_cutoff = np.round(np.log10(cutoff), 2)
+        log_cutoff = np.inf
+        if args.activation == "ReLU":
+            log_cutoff = np.round(np.log10(cutoff), 2)
         print("Computing with cutoff ", cutoff)
         for i in range(len(xs)):
             for j in range(i, len(xs)):
@@ -139,7 +110,7 @@ if __name__ == "__main__":
         denom = np.array(denom)
         lam = (numerator/denom)
         print("cutoff: ", cutoff, "stdev in lam = ", np.nanstd(lam))
-        pickle.dump(lam, open("lam_m_"+str(cutoff)+"_"+args.activation+"_width_"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle",'wb'))
+        pickle.dump(lam, open("lam_"+str(cutoff)+"_"+args.activation+"_width_"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle",'wb'))
         lambda_average = np.nanmean(lam)
         log_lam = [np.log10(np.abs(i)) for i in lam.flatten().tolist() if (~np.isnan(i))]
         loglamlist.extend(log_lam)
@@ -157,7 +128,9 @@ if __name__ == "__main__":
     from scipy import stats
 
     df_lam = pd.DataFrame({"log_lambda": loglamlist, "log_cutoff": logcut})
-    slope, intercept, r_value, p_value, std_err = stats.linregress(df_lam['log_cutoff'],df_lam['log_lambda'])
+    
+    if args.activation == "ReLU":
+        slope, intercept, r_value, p_value, std_err = stats.linregress(df_lam['log_cutoff'],df_lam['log_lambda'])
 
 
     rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
@@ -200,6 +173,6 @@ if __name__ == "__main__":
     plt.tight_layout()
     plt.legend()
     import datetime
-    #plt.savefig("rg_"+args.activation+"_din"+str(args.d_in)+".pdf",bbox_inches='tight')
+    plt.savefig("rg_"+args.activation+"_din"+str(args.d_in)+".pdf",bbox_inches='tight')
     plt.figure()
-    plt.show()
+    # plt.show()

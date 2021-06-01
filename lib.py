@@ -301,34 +301,121 @@ def trim_sym_tensor4(a, args):
 
 def four_pt_int(x1, x2, x3, x4, cutoff, args):
     if args.d_in == 1:
-        neg = integrate.quad(lambda x: (24.)*K_int(x, x1.item(), args)*K_int(x, x2.item(), args)*K_int(x, x3.item(), args)*K_int(x, x4.item(), args), -cutoff, 0)[0]
-        pos = integrate.quad(lambda x: (24.)*K_int(x, x1.item(), args)*K_int(x, x2.item(), args)*K_int(x, x3.item(), args)*K_int(x, x4.item(), args), 0, cutoff)[0]
+        neg = integrate.quad(lambda x: (24.)*K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), -cutoff, 0)[0]
+        pos = integrate.quad(lambda x: (24.)*K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), 0, cutoff)[0]
         return neg + pos
     if args.d_in == 2:
-        q1 = integrate.dblquad(lambda y, x: (24.)*K_int((x, y), tuple(x1.tolist()), args)*K_int((x, y), tuple(x2.tolist()), args)*K_int((x, y), tuple(x3.tolist()), args)*K_int((x, y), tuple(x4.tolist()), args), -cutoff, 0, -cutoff, 0)[0]
-        q2 = integrate.dblquad(lambda y, x: (24.)*K_int((x, y), tuple(x1.tolist()), args)*K_int((x, y), tuple(x2.tolist()), args)*K_int((x, y), tuple(x3.tolist()), args)*K_int((x, y), tuple(x4.tolist()), args), -cutoff, 0, 0, cutoff)[0]
-        q3 = integrate.dblquad(lambda y, x: (24.)*K_int((x, y), tuple(x1.tolist()), args)*K_int((x, y), tuple(x2.tolist()), args)*K_int((x, y), tuple(x3.tolist()), args)*K_int((x, y), tuple(x4.tolist()), args), 0, cutoff, -cutoff, 0)[0]
-        q4 = integrate.dblquad(lambda y, x: (24.)*K_int((x, y), tuple(x1.tolist()), args)*K_int((x, y), tuple(x2.tolist()), args)*K_int((x, y), tuple(x3.tolist()), args)*K_int((x, y), tuple(x4.tolist()), args), 0, cutoff, 0, cutoff)[0]
+        q1 = integrate.dblquad(lambda y, x: (24.)*K_EFT((x, y), tuple(x1.tolist()), args)*K_EFT((x, y), tuple(x2.tolist()), args)*K_EFT((x, y), tuple(x3.tolist()), args)*K_EFT((x, y), tuple(x4.tolist()), args), -cutoff, 0, -cutoff, 0)[0]
+        q2 = integrate.dblquad(lambda y, x: (24.)*K_EFT((x, y), tuple(x1.tolist()), args)*K_EFT((x, y), tuple(x2.tolist()), args)*K_EFT((x, y), tuple(x3.tolist()), args)*K_EFT((x, y), tuple(x4.tolist()), args), -cutoff, 0, 0, cutoff)[0]
+        q3 = integrate.dblquad(lambda y, x: (24.)*K_EFT((x, y), tuple(x1.tolist()), args)*K_EFT((x, y), tuple(x2.tolist()), args)*K_EFT((x, y), tuple(x3.tolist()), args)*K_EFT((x, y), tuple(x4.tolist()), args), 0, cutoff, -cutoff, 0)[0]
+        q4 = integrate.dblquad(lambda y, x: (24.)*K_EFT((x, y), tuple(x1.tolist()), args)*K_EFT((x, y), tuple(x2.tolist()), args)*K_EFT((x, y), tuple(x3.tolist()), args)*K_EFT((x, y), tuple(x4.tolist()), args), 0, cutoff, 0, cutoff)[0]
         return q1 + q2 + q3 + q4
     if args.d_in == 3:
-        q1 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, -cutoff, 0,-cutoff, 0)[0]
-        q2 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), 0, cutoff, -cutoff, 0,-cutoff, 0)[0]
-        q3 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, -cutoff, 0,0, cutoff)[0]
-        q4 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), 0, cutoff, -cutoff, 0,0, cutoff)[0]
-        q5 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, 0, cutoff,-cutoff, 0)[0]
-        q6 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), 0, cutoff, 0, cutoff,-cutoff, 0)[0]
-        q7 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, 0, cutoff ,0, cutoff)[0]
-        q8 = integrate.tplquad(lambda z, y, x: (24.)*K_int((x, y, z), tuple(x1.tolist()), args)*K_int((x, y, z), tuple(x2.tolist()), args)*K_int((x, y, z), tuple(x3.tolist()), args)*K_int((x, y, z), tuple(x4.tolist()), args), 0, cutoff, 0, cutoff,0, cutoff)[0]
+        q1 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, -cutoff, 0,-cutoff, 0)[0]
+        q2 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), 0, cutoff, -cutoff, 0,-cutoff, 0)[0]
+        q3 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, -cutoff, 0,0, cutoff)[0]
+        q4 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), 0, cutoff, -cutoff, 0,0, cutoff)[0]
+        q5 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, 0, cutoff,-cutoff, 0)[0]
+        q6 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), 0, cutoff, 0, cutoff,-cutoff, 0)[0]
+        q7 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), -cutoff, 0, 0, cutoff ,0, cutoff)[0]
+        q8 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), 0, cutoff, 0, cutoff,0, cutoff)[0]
         return q1 + q2 + q3 + q4 + q5 + q6 + q7 + q8
 
 
 def intkappa(x1, x2, x3, x4, x5, x6, cutoff, args):
+    if args.activation == "GaussNet" or args.activation == "Erf":
+        return intkappa_infinite(x1, x2, x3, x4, x5, x6, cutoff, args)
     xx1 = x1.item()
     xx2 = x2.item()
     xx3 = x3.item()
     xx4 = x4.item()
     xx5 = x5.item()
     xx6 = x6.item()
-    left = integrate.quad(lambda x: K_int(x, xx1, args)*K_int(x, xx2, args)*K_int(x, xx3, args)*K_int(x, xx4, args)*K_int(xx5, xx6, args), -cutoff, 0)[0]
-    right = integrate.quad(lambda x: K_int(x, xx1, args)*K_int(x, xx2, args)*K_int(x, xx3, args)*K_int(x, xx4, args)*K_int(xx5, xx6, args), 0, cutoff)[0]
+    left = integrate.quad(lambda x: K_EFT(x, xx1, args)*K_EFT(x, xx2, args)*K_EFT(x, xx3, args)*K_EFT(x, xx4, args)*K_EFT(xx5, xx6, args), -cutoff, 0)[0]
+    right = integrate.quad(lambda x: K_EFT(x, xx1, args)*K_EFT(x, xx2, args)*K_EFT(x, xx3, args)*K_EFT(x, xx4, args)*K_EFT(xx5, xx6, args), 0, cutoff)[0]
     return left + right
+
+
+def K_EFT(x,xp,args):
+    if args.activation == "Erf":
+        a = K_int_erf(x,xp,args) - args.sb**2
+        return a
+    if args.activation == "ReLU":
+        a = K_int_relu(x, xp, args) - args.sb**2
+        return a
+    if args.activation == "GaussNet":
+        a = K_int_GaussNet(x, xp, args) - args.sb**2
+        return a
+
+def intkappa_infinite(x1, x2, x3, x4, x5, x6, cutoff, args):
+    xx1 = x1.item()
+    xx2 = x2.item()
+    xx3 = x3.item()
+    xx4 = x4.item()
+    xx5 = x5.item()
+    xx6 = x6.item()
+    full = integrate.quad(lambda x: K_EFT(x, xx1, args)*K_EFT(x, xx2, args)*K_EFT(x, xx3, args)*K_EFT(x, xx4, args)*K_EFT(xx5, xx6, args), -cutoff, cutoff)[0]
+    return full
+
+def four_pt_int_infinite(x1, x2, x3, x4, cutoff, args):
+    if args.d_in == 1:
+        q1 = integrate.quad(lambda x: (24.)*K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), -cutoff, cutoff)[0]
+        return q1
+    if args.d_in == 2:
+        q1 = integrate.dblquad(lambda y, x: (24.)*K_EFT((x, y), tuple(x1.tolist()), args)*K_EFT((x, y), tuple(x2.tolist()), args)*K_EFT((x, y), tuple(x3.tolist()), args)*K_EFT((x, y), tuple(x4.tolist()), args), -cutoff, cutoff, -cutoff, cutoff)[0]
+        return q1
+    if args.d_in == 3:
+        q1 = integrate.tplquad(lambda z, y, x: (24.)*K_EFT((x, y, z), tuple(x1.tolist()), args)*K_EFT((x, y, z), tuple(x2.tolist()), args)*K_EFT((x, y, z), tuple(x3.tolist()), args)*K_EFT((x, y, z), tuple(x4.tolist()), args), -cutoff, cutoff, -cutoff, cutoff,-cutoff, cutoff)[0]
+        return q1
+
+
+
+
+
+def local0(x1, x2, x3, x4, cutoff, args):
+    int_feyn = 0
+    if args.activation == "ReLU" or args.activation == "Erf":
+        int_feyn += integrate.quad(lambda x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), -cutoff, 0)[0]
+        int_feyn += integrate.quad(lambda x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), 0, cutoff)[0]
+
+    if args.activation == "GaussNet":
+        int_feyn += integrate.quad(lambda x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), -cutoff, cutoff)[0]
+
+    return 24*int_feyn                                # combinatorial factor 24
+
+def local2(x1, x2, x3, x4, cutoff, args):
+    int_feyn = 0
+    if args.activation == "ReLU" or args.activation == "Erf":
+        int_feyn += integrate.quad(lambda x: x**2*K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), -cutoff, 0)[0]
+        int_feyn += integrate.quad(lambda x: x**2*K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), 0, cutoff)[0]
+    
+    if args.activation == "GaussNet":
+        int_feyn += integrate.quad(lambda x: x**2*K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(x, x4.item(), args), -cutoff, cutoff)[0]
+    
+    return 24*int_feyn                               # combinatorial factor 24
+
+def nonlocal22(x1, x2, x3, x4, cutoff, args):
+    int_feyn = 0
+    if args.activation == "ReLU" or args.activation == "Erf":
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(y, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, 0, -cutoff, 0)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(y, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, 0, 0, cutoff)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(y, x3.item(), args)*K_EFT(y, x4.item(), args), 0, cutoff, -cutoff, 0)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(y, x3.item(), args)*K_EFT(y, x4.item(), args), 0, cutoff, 0, cutoff)[0]
+
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(y, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, 0, -cutoff, 0)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(y, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, 0, 0, cutoff)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(y, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), 0, cutoff, -cutoff, 0)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(y, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), 0, cutoff, 0, cutoff)[0]
+
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(y, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, 0, -cutoff, 0)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(y, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, 0, 0, cutoff)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(y, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), 0, cutoff, -cutoff, 0)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(y, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), 0, cutoff, 0, cutoff)[0]
+            
+    if args.activation == "GaussNet":
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(y, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, cutoff, -cutoff, cutoff)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(x, x1.item(), args)*K_EFT(y, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, cutoff, -cutoff, cutoff)[0]
+        int_feyn += integrate.dblquad(lambda y, x: K_EFT(y, x1.item(), args)*K_EFT(x, x2.item(), args)*K_EFT(x, x3.item(), args)*K_EFT(y, x4.item(), args), -cutoff, cutoff, -cutoff, cutoff)[0]
+    
+#        print("doing integral nonlocal")
+    return 8*int_feyn                              # to make up total 24 diagrams

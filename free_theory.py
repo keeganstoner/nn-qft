@@ -6,11 +6,11 @@ from lib import *
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--activation", type=str, default = "Erf")
+    parser.add_argument("--activation", type=str, default = "ReLU")
     parser.add_argument('--exp', type=str, default = None)
     parser.add_argument("--width", type=int, default = 100)
     parser.add_argument("--n-inputs", type = int, default = 6)
-    parser.add_argument("--n-models", type = int, default = 10**4)
+    parser.add_argument("--n-models", type = int, default = 10**3)
     parser.add_argument("--d-in", type = int, default = 1)
     parser.add_argument("--d-out", type = int, default = 1)
     parser.add_argument("--sb", type = float, default = 1.0)
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument("--mb", type = float, default = 0.0)
     parser.add_argument("--mw", type = float, default = 0.0)
     parser.add_argument("--cuda", action = 'store_true', default = False)
-    parser.add_argument("--n-pt", type = int, default = 6)
+    parser.add_argument("--n-pt", type = int, default = 4)
 
     args = parser.parse_args()
 
@@ -116,6 +116,8 @@ if __name__ == "__main__":
 
         if n == 6:
             pickle.dump(n_exp, open("six_pt_exp_"+args.activation+"_width"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle",'wb')) 
+        if n == 4:
+            pickle.dump(n_exp, open("four_pt_exp_"+args.activation+"_width"+str(width)+"_din"+str(args.d_in)+"_"+xset+".pickle",'wb')) 
 
         # computes elementwise standard deviation among chunks
         n_diff_std = np.nanstd(n_exp, axis = 0)/np.array(n_thy)
@@ -126,15 +128,11 @@ if __name__ == "__main__":
 
         mean1 = np.mean(n_diff)
         background1 = np.mean(n_diff_std)
-        backgrounds.append(background1)
 
         for i in range(len(n_diff)):
             widths_list.append(width)
+            backgrounds.append(background1)
 
-    signal = sum(backgrounds)/len(backgrounds)
-    backgrounds = []
-    for i in range(len(n_diff_full)):
-        backgrounds.append(signal)
 
     df = pd.DataFrame({"width": widths_list, "n_point": n_diff_full, "background": backgrounds})
     df['log10width'] = np.log10(df['width'])
@@ -190,7 +188,7 @@ if __name__ == "__main__":
     t += 0.01
     plt.ylim(b, t) 
     plt.margins(0,0) # aesthetics
-    #plt.savefig("gp_"+args.activation+str(n)+".pdf",bbox_inches='tight')
+    plt.savefig("gp_"+args.activation+str(n)+".pdf",bbox_inches='tight')
     plt.legend()
     plt.figure()
-    plt.show()
+    # plt.show()
