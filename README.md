@@ -85,7 +85,7 @@ Requires ```free_theory.py``` to be run first with ```n = 4, 6```. Produces the 
 ```
 
 
-abd
+and
 
 ```
 @article{Halverson_2021,
